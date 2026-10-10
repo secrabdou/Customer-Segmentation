@@ -70,12 +70,18 @@ uploaded_file = st.file_uploader("Upload or Copy/Paste an image here...", type=[
 image = None
 
 # Determine which image to process (Uploaded file takes priority over sample)
+# Determine which image to process (Uploaded file takes priority over sample)
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
 elif sample_images[selected_sample] is not None:
-    # Fetch the sample image from the internet
-    response = requests.get(sample_images[selected_sample])
-    image = Image.open(BytesIO(response.content)).convert("RGB")
+    # Fetch the sample image from the internet with a User-Agent header
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+    response = requests.get(sample_images[selected_sample], headers=headers)
+    
+    if response.status_code == 200:
+        image = Image.open(BytesIO(response.content)).convert("RGB")
+    else:
+        st.error(f"Failed to load sample image. Status code: {response.status_code}")
 
 # Run inference whenever an image is loaded (uploaded OR selected sample)
 if image is not None:
