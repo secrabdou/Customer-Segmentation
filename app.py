@@ -4,6 +4,8 @@ import torchvision.transforms as T
 from torchvision.models import resnet34
 from huggingface_hub import hf_hub_download
 from PIL import Image
+import requests
+from io import BytesIO
 
 st.title("🐾 Pet Breed Classifier")
 st.write("Upload a photo of a pet to identify its breed.")
@@ -34,6 +36,14 @@ def load_model():
 
 model, class_names = load_model()
 
+with st.expander("ℹ️ See the 37 breeds this model can recognize"):
+    st.warning("Note: This model only knows the specific breeds listed below. If you upload a breed not on this list (like a Husky or Golden Retriever), the model will try to guess the closest visual match.")
+    
+    # Sort and display the classes neatly
+    sorted_breeds = sorted(class_names)
+    formatted_list = ", ".join(sorted_breeds)
+    st.write(formatted_list)
+
 # Define image preprocessing
 transform = T.Compose([
     T.Resize((224, 224)),
@@ -41,11 +51,35 @@ transform = T.Compose([
     T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png", "webp"])
+st.write("### Test the Model")
 
+# Sample Images Dropdown
+sample_images = {
+    "Select a sample image...": None,
+    "Sample 1: Abyssinian Cat": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Gustav_chocolate.jpg",
+    "Sample 2: Beagle Dog": "https://upload.wikimedia.org/wikipedia/commons/5/55/Beagle_600.jpg"
+}
+
+selected_sample = st.selectbox("Try a ready-made photo:", list(sample_images.keys()))
+
+st.write("--- OR ---")
+
+# Copy-Paste friendly uploader
+uploaded_file = st.file_uploader("Upload or Copy/Paste an image here...", type=["jpg", "jpeg", "png", "webp"])
+
+image = None
+
+# Determine which image to process (Uploaded file takes priority over sample)
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+elif sample_images[selected_sample] is not None:
+    # Fetch the sample image from the internet
+    response = requests.get(sample_images[selected_sample])
+    image = Image.open(BytesIO(response.content)).convert("RGB")
+
+# Run inference whenever an image is loaded (uploaded OR selected sample)
+if image is not None:
+    st.image(image, caption="Selected Image", use_column_width=True)
     
     img_tensor = transform(image).unsqueeze(0)
     with torch.no_grad():
@@ -55,5 +89,14 @@ if uploaded_file is not None:
     top_prob, top_catid = torch.topk(probs, 3)
     
     st.subheader("Top Predictions:")
+    
+    # Confidence threshold check
+    CONFIDENCE_THRESHOLD = 0.40  # 40%
+    highest_confidence = top_prob[0].item()
+    
+    if highest_confidence < CONFIDENCE_THRESHOLD:
+        st.warning("⚠️ Low confidence! This image might not contain a recognized pet, or the pet is too far away. Try cropping the photo closer to the animal's face.")
+    
+    # Display the results
     for i in range(top_prob.size(0)):
         st.write(f"**{class_names[top_catid[i]]}**: {top_prob[i].item()*100:.2f}%")
