@@ -33,8 +33,8 @@ This project is under active development. Current work-in-progress features incl
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/secrabdou/Customer-Segmentation.git
-cd Customer-Segmentation
+git clone https://github.com/secrabdou/pet-breed-classifier.git
+cd pet-breed-classifier
 ```
 
 2. Install dependencies:
