@@ -15,9 +15,8 @@ Identifying specific pet breeds visually can be challenging due to high inter-cl
 * **Preprocessing:** Standard ResNet transformations (224x224 resize, RGB conversion, ImageNet normalization).
 
 ## Results & Evaluation
-*(Note: Add your actual metrics here once you calculate them)*
-* **Headline Accuracy:** XX% on the validation set.
-* **Confusion Matrix:** *(Add an image of your confusion matrix here to show which similar-looking breeds get mixed up)*.
+
+* **Headline Accuracy:** 91,71% on the validation set.
 * **Failure Modes:** Analyzed the worst-performing examples to understand where the model struggles (e.g., extreme close-ups, noisy backgrounds, or specific breed overlaps).
 
 ## Honest Limitations
