@@ -1,6 +1,6 @@
 # 🐾 Pet Breed Classifier 
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](YOUR_STREAMLIT_LINK_HERE)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://pet-breed-classifier-nswfp7ktf6mzupbtaeck4b.streamlit.app/)
 
 ## Overview
 A web application that classifies images of dogs and cats into 37 specific breeds. Built with PyTorch and Streamlit, this project leverages a fine-tuned ResNet-34 model trained on the Oxford-IIIT Pet Dataset. 
